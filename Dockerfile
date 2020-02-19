@@ -3,24 +3,26 @@ FROM alpine:latest
 ARG BUILD_DATE
 ARG VCS_REF
 
-LABEL maintainer="Margot Bayle <margot.bayle@protonmail.com>" \
+LABEL maintainer="SunnyBase <sunnybase@protonmail.com>" \
     architecture="amd64/x86_64" \
     nginx-version="1.17.8" \
     alpine-version="3.11.3" \
     build="18-Feb-2020" \
     org.opencontainers.image.title="alpine-nginx" \
     org.opencontainers.image.description="Nginx Docker image running on Alpine Linux" \
-    org.opencontainers.image.authors="Margot Bayle (inspired by Dominic Taylor <dominic@yobasystems.co.uk>)" \
+    org.opencontainers.image.authors="SunnyBase (inspired by Dominic Taylor <dominic@yobasystems.co.uk>)" \
     org.opencontainers.image.vendor="SunnyBase" \
     org.opencontainers.image.version="v1.17.8" \
     org.opencontainers.image.url="https://hub.docker.com/r/yobasystems/alpine-nginx/" \
-    org.opencontainers.image.source="https://github.com/yobasystems/alpine-nginx" \
+    org.opencontainers.image.source="https://hub.docker.com/repository/docker/sunnybase/alpine" \
     org.opencontainers.image.revision=$VCS_REF \
     org.opencontainers.image.created=$BUILD_DATE
 
-ENV NGINX_VERSION=1.17.7
+ENV NGINX_VERSION=1.17.8
 
 RUN \
+  echo "https://mirror.leaseweb.com/alpine/latest-stable/main" > /etc/apk/repositories && \
+  echo "https://mirror.leaseweb.com/alpine/latest-stable/community" >>/etc/apk/repositories && \
   build_pkgs="build-base linux-headers openssl-dev pcre-dev wget zlib-dev" && \
   runtime_pkgs="ca-certificates openssl pcre zlib tzdata git" && \
   apk --no-cache add ${build_pkgs} ${runtime_pkgs} && \
@@ -74,11 +76,10 @@ RUN \
   apk del ${build_pkgs} && \
   rm -rf /var/cache/apk/*
 
-COPY files/index.html /etc/nginx/html/
-COPY files/nginx.conf /etc/nginx/nginx.conf
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
 VOLUME ["/var/cache/nginx"]
 
 EXPOSE 80 443
 
-CMD ["nginx"]
+CMD ["nginx", "-g", "daemon off;"]
