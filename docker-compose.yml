@@ -1,0 +1,9 @@
+version : '3.7'
+services:
+    nginx:
+        image: sunnybase/nginx
+        volumes:
+            - ./files:/www
+            - ./config:/etc/nginx/conf.d
+        ports:
+            - '8080:80'
